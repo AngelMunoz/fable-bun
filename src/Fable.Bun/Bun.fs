@@ -5,6 +5,10 @@ open Fable.Core
 open Fable.Core.JsInterop
 open Browser.Types
 open Fetch
+open System.Collections.Generic
+
+type BunHandler = Request -> U2<Response, JS.Promise<Response>>
+type BunErrorHandler = exn -> U2<Response, JS.Promise<Response>>
 
 type BlobPart = U4<string, Blob, JS.ArrayBuffer, JS.ArrayBufferView>
 type StringOrBuffer = U3<string, JS.TypedArray, JS.ArrayBuffer>
@@ -35,10 +39,34 @@ type EditorOptions =
     abstract line: float option
     abstract column: float option
 
-type BunServeOptions =
+type ServeOptions =
     abstract port: int option
-    abstract fetch: Request -> U2<Response, JS.Promise<Response>>
-    abstract error: exn -> U2<Response, JS.Promise<Response>>
+    abstract hostname: string option
+    abstract baseURI: string option
+    abstract maxRequestBodySize: float option
+    abstract development: bool option
+    abstract fetch: BunHandler
+    abstract error: BunErrorHandler option
+
+type SSLOptions =
+    abstract keyFile: string
+    abstract certFile: string
+
+type SSLAdvancedOptions =
+    abstract passphrase: string option
+    abstract caFile: string option
+    abstract dhParamsFile: string option
+    abstract lowMemoryMode: bool option
+
+type SSLServerOptions =
+    inherit ServeOptions
+    inherit SSLOptions
+    inherit SSLAdvancedOptions
+
+    abstract serverNames: IDictionary<string, U2<SSLOptions, SSLAdvancedOptions>>
+
+type Serve = U2<SSLServerOptions, ServeOptions>
+
 
 type BunServer =
     abstract stop: unit -> unit
@@ -62,7 +90,7 @@ type unsafe =
 
 [<Global; Erase>]
 type Bun =
-    static member serve(options: obj) : BunServer = jsNative
+    static member serve(options: Serve) : BunServer = jsNative
     static member resolveSync(moduleId: string, parent: string) : string = jsNative
     static member resolve(moduleId: string, parent: string) : JS.Promise<string> = jsNative
 
