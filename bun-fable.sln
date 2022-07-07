@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8E6E0562-4693-4E52-84CB-E8908D2843CC}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Fable.Bun", "src\Fable.Bun\Fable.Bun.fsproj", "{5387557E-4C49-4BE6-B428-956C6BBC8F18}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Fable.Bun.Sample", "src\Fable.Bun.Sample\Fable.Bun.Sample.fsproj", "{5940FFA0-0D0A-461A-A489-8E3FD959A511}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5387557E-4C49-4BE6-B428-956C6BBC8F18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5387557E-4C49-4BE6-B428-956C6BBC8F18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5387557E-4C49-4BE6-B428-956C6BBC8F18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5387557E-4C49-4BE6-B428-956C6BBC8F18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5940FFA0-0D0A-461A-A489-8E3FD959A511}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5940FFA0-0D0A-461A-A489-8E3FD959A511}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5940FFA0-0D0A-461A-A489-8E3FD959A511}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5940FFA0-0D0A-461A-A489-8E3FD959A511}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5387557E-4C49-4BE6-B428-956C6BBC8F18} = {8E6E0562-4693-4E52-84CB-E8908D2843CC}
+		{5940FFA0-0D0A-461A-A489-8E3FD959A511} = {8E6E0562-4693-4E52-84CB-E8908D2843CC}
+	EndGlobalSection
+EndGlobal

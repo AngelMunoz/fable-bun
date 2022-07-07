@@ -7,6 +7,6 @@
   "license": "ISC",
   "scripts": {
     "prestart": "dotnet tool restore",
-    "start": "dotnet fable watch src -s -o dist --runWatch bun ./dist/Library.js"
+    "start": "dotnet fable watch src/Fable.Bun.Sample -s -o dist/Fable.Bun.Sample --runWatch bun ./dist/Fable.Bun.Sample/Program.js"
   }
 }
