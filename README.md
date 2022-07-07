@@ -11,3 +11,9 @@ I'd be glad to work towards something like that
 
 - .NET6 and above - https://get.dot.net
 - Bun - [bun.sh]
+
+# Try the sample
+
+After installing .NET + Bun just run
+
+`bun start` on your terminal and it should just work
