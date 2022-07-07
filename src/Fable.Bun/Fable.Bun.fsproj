@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <Compile Include="Bun.fs" />
-    <Compile Include="Library.fs" />
   </ItemGroup>
 
   <ItemGroup>
