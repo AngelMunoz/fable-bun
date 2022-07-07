@@ -1,0 +1,12 @@
+{
+  "name": "bun-sample",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "scripts": {
+    "prestart": "dotnet tool restore",
+    "start": "dotnet fable watch src -s -o dist --runWatch bun ./dist/Library.js"
+  }
+}
