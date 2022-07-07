@@ -76,16 +76,18 @@ let Home (req: Request) =
 
     Views.Layout(content, [ styles ])
 
+let appHandler: BunHandler =
+    fun req ->
+        let view = Home req |> Render.htmlDocument
+        Response.create (unbox view, {| headers = {| ``content-type`` = "text/html" |} |})
+
 [<EntryPoint>]
 let main argv =
     let server =
-        Bun.serve (
-            {| fetch =
-                fun (req: Request) ->
-                    let view = Home req |> Render.htmlDocument
-                    Response.create (!!view, {| headers = {| ``content-type`` = "text/html" |} |})
-               development = true |}
-        )
+        Bix.Server
+        |> Bix.withDevelopment true
+        |> Bix.withFetch appHandler
+        |> Bix.run
 
     let mode =
         if server.development then
