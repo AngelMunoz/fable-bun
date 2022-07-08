@@ -2,8 +2,6 @@
 module Extensions
 
 open Fable.Core
-open Fetch
-open Browser.Types
 open Bix.Types
 
 [<Emit("{...$0, ...$1}")>]
@@ -15,6 +13,7 @@ let inline internal createResponseInit (content: obj) (options: obj) = jsNative
 let compose (h1: HttpHandler) (h2: HttpHandler) : HttpHandler =
     fun final ->
         let fn = final |> h2 |> h1
+
         fun ctx ->
             match ctx.HasStarted with
             | true -> final ctx
