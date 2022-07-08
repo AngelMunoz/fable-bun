@@ -1,5 +1,4 @@
-[<AutoOpen>]
-module Bun
+module Fable.Bun
 
 open Fable.Core
 open Fable.Core.JsInterop
@@ -13,12 +12,69 @@ type BunErrorHandler = exn -> U2<Response, JS.Promise<Response>>
 type BlobPart = U4<string, Blob, JS.ArrayBuffer, JS.ArrayBufferView>
 type StringOrBuffer = U3<string, JS.TypedArray, JS.ArrayBuffer>
 
-type Response with
-    [<Emit("new Response($0)")>]
-    static member create(content: U2<BlobPart, BlobPart array>) = jsNative
+type ResponseInitArgs =
+    | Status of int
+    | StatusText of string
+    | Headers of (string * string)[]
 
-    [<Emit("new Response($0, $1)")>]
-    static member create(content: U2<BlobPart, BlobPart array>, resInit: obj) = jsNative
+[<Emit("new Response($0, $1)")>]
+let inline private createResponseInit (content: obj, options: obj) = jsNative
+
+type Request with
+
+    [<Emit "$0.clone()">]
+    member _.clone() : Request = jsNative
+
+type Response with
+    static member inline create(content: string, ?options: RequestInit) = createResponseInit (content, options)
+    static member inline create(content: Blob, ?options: RequestInit) = createResponseInit (content, options)
+    static member inline create(content: JS.ArrayBuffer, ?options: RequestInit) = createResponseInit (content, options)
+
+    static member inline create(content: JS.ArrayBufferView, ?options: RequestInit) =
+        createResponseInit (content, options)
+
+    static member inline create(content: string, ?options: seq<ResponseInitArgs>) =
+        let options = defaultArg options Seq.empty
+
+        let opts = options |> keyValueList CaseRules.LowerFirst
+
+        createResponseInit (content, opts)
+
+    static member inline create(content: Blob, ?options: seq<ResponseInitArgs>) =
+        let options = defaultArg options Seq.empty
+
+        let opts = options |> keyValueList CaseRules.LowerFirst
+
+        createResponseInit (content, opts)
+
+    static member inline create(content: JS.ArrayBuffer, ?options: seq<ResponseInitArgs>) =
+        let options = defaultArg options Seq.empty
+
+        let opts = options |> keyValueList CaseRules.LowerFirst
+
+        createResponseInit (content, opts)
+
+    static member inline create(content: JS.ArrayBufferView, ?options: seq<ResponseInitArgs>) =
+        let options = defaultArg options Seq.empty
+
+        let opts = options |> keyValueList CaseRules.LowerFirst
+
+        createResponseInit (content, opts)
+
+    [<Emit("$0.clone()")>]
+    member _.clone() : Response = jsNative
+
+    [<Emit("Response.json($0, $1)")>]
+    static member inline json(?body: obj, ?options: ResponseInit) : Response = jsNative
+
+    [<Emit("Response.json($0, $1)")>]
+    static member inline json(?body: obj, ?options: int) : Response = jsNative
+
+    [<Emit("Response.redirect($0, $1)")>]
+    static member inline redirect(?url: string, ?status: int) : Response = jsNative
+
+    [<Emit("Response.error($0, $1)")>]
+    static member inline error() : Response = jsNative
 
 type MMapOptions =
     abstract sync: bool option
