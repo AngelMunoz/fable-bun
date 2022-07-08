@@ -102,7 +102,7 @@ let inline run (args: seq<BixServerArgs>) =
     | None -> Bun.serve (unbox restArgs)
 
 let BixHandler (routes: RouteMap) (req: Request) : JS.Promise<Response> =
-    let ctx = HttpContext(jsThis, req, createResponseInit "" {|  |})
+    let ctx = HttpContext(jsThis, unbox (req.clone ()), createResponseInit "" {|  |})
 
     promise {
         let url = createUrl req.url
