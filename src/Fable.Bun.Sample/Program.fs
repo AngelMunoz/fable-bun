@@ -148,6 +148,8 @@ let jsonHandler =
                 |> Some
         }
 
+let textHandler: HttpHandler =
+    fun next ctx -> promise { return "Hello, World!" |> BixResponse.Text |> Some }
 
 [<EntryPoint>]
 let main argv =
@@ -160,7 +162,7 @@ let main argv =
             |> Router.get ("/json", jsonHandler)
             // TEST: THIS THING LOOKS BROKEN
             |> Router.get ("/login", (checkCredentials >=> login))
-            |> Router.get ("/text", (fun next ctx -> promise { return "Hello, World!" |> BixResponse.Text |> Some }))
+            |> Router.get ("/text", textHandler)
         )
         |> Server.run
 
