@@ -9,6 +9,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Fable.Bun", "src\Fable.Bun\
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Fable.Bun.Sample", "src\Fable.Bun.Sample\Fable.Bun.Sample.fsproj", "{5940FFA0-0D0A-461A-A489-8E3FD959A511}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Bix", "src\Bix\Bix.fsproj", "{F27118FF-7DF9-4FDE-94FD-1DEBD22B3C6C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,9 +28,14 @@ Global
 		{5940FFA0-0D0A-461A-A489-8E3FD959A511}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5940FFA0-0D0A-461A-A489-8E3FD959A511}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5940FFA0-0D0A-461A-A489-8E3FD959A511}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F27118FF-7DF9-4FDE-94FD-1DEBD22B3C6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F27118FF-7DF9-4FDE-94FD-1DEBD22B3C6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F27118FF-7DF9-4FDE-94FD-1DEBD22B3C6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F27118FF-7DF9-4FDE-94FD-1DEBD22B3C6C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5387557E-4C49-4BE6-B428-956C6BBC8F18} = {8E6E0562-4693-4E52-84CB-E8908D2843CC}
 		{5940FFA0-0D0A-461A-A489-8E3FD959A511} = {8E6E0562-4693-4E52-84CB-E8908D2843CC}
+		{F27118FF-7DF9-4FDE-94FD-1DEBD22B3C6C} = {8E6E0562-4693-4E52-84CB-E8908D2843CC}
 	EndGlobalSection
 EndGlobal

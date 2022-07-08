@@ -64,6 +64,9 @@ type Response with
     [<Emit("$0.clone()")>]
     member _.clone() : Response = jsNative
 
+    [<Emit("$0.json()")>]
+    member _.json<'T>() : JS.Promise<'T> = jsNative
+
     [<Emit("Response.json($0, $1)")>]
     static member inline json(?body: obj, ?options: ResponseInit) : Response = jsNative
 

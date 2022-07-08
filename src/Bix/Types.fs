@@ -2,8 +2,6 @@ module Bix.Types
 
 open Fable.Core
 open Browser.Types
-open Fable.Core
-open Fable.Core.JsInterop
 open Fetch
 open Fable.Bun
 
@@ -32,9 +30,17 @@ type BixResponse =
     | Json of obj
     | Custom of obj * ResponseInitArgs list
 
-type HttpContext(server: BunServer, req: Request) =
+[<AttachMembers>]
+type HttpContext(server: BunServer, req: Request, res: Response) =
+    let mutable _res = res
+    let mutable hasStarted = false
     member _.Request: Request = req
     member _.Server: BunServer = server
+    member _.Response: Response = _res
+    member _.HasStarted: bool = hasStarted
+    member _.SetStarted(setStarted: bool) = hasStarted <- setStarted
+
+    member _.SetResponse(response: Response) = _res <- response
 
 type HttpFuncResult = JS.Promise<BixResponse option>
 

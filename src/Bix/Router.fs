@@ -1,9 +1,5 @@
 [<RequireQualifiedAccess>]
 module Bix.Router
-
-open Fable.Bun
-open Fable.Core
-open Fetch
 open Bix.Types
 
 let Empty = Map.empty
