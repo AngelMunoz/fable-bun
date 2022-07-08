@@ -137,15 +137,15 @@ let BixHandler (routes: RouteMap) (req: Request) : JS.Promise<Response> =
                 return
                     Response.create (
                         value,
-                        [ ResponseInitArgs.Status status
-                          ResponseInitArgs.Headers [| "content-type", "text/plain" |] ]
+                        [ Status status
+                          Headers [| "content-type", "text/plain" |] ]
                     )
             | Html value ->
                 return
                     Response.create (
                         value,
-                        [ ResponseInitArgs.Status status
-                          ResponseInitArgs.Headers [| "content-type", "text/html" |] ]
+                        [ Status status
+                          Headers [| "content-type", "text/html" |] ]
                     )
             | Json value ->
                 let content = JS.JSON.stringify (value)
@@ -153,37 +153,37 @@ let BixHandler (routes: RouteMap) (req: Request) : JS.Promise<Response> =
                 return
                     Response.create (
                         content,
-                        [ ResponseInitArgs.Status status
-                          ResponseInitArgs.Headers [| "content-type", "application/json" |] ]
+                        [ Status status
+                          Headers [| "content-type", "application/json" |] ]
                     )
             | Blob (content, mimeType) ->
                 return
                     Response.create (
                         content,
-                        [ ResponseInitArgs.Status status
-                          ResponseInitArgs.Headers [| "content-type", mimeType |] ]
+                        [ Status status
+                          Headers [| "content-type", mimeType |] ]
                     )
             | ArrayBufferView (content, mimeType) ->
                 return
                     Response.create (
                         content,
-                        [ ResponseInitArgs.Status status
-                          ResponseInitArgs.Headers [| "content-type", mimeType |] ]
+                        [ Status status
+                          Headers [| "content-type", mimeType |] ]
                     )
             | ArrayBuffer (content, mimeType) ->
                 return
                     Response.create (
                         content,
-                        [ ResponseInitArgs.Status status
-                          ResponseInitArgs.Headers [| "content-type", mimeType |] ]
+                        [ Status status
+                          Headers [| "content-type", mimeType |] ]
                     )
             | BixResponse.Custom (content, args) ->
                 return
                     Response.create (
                         // it might not be a string but we don't really care
                         unbox<string> content,
-                        [ ResponseInitArgs.Status status
-                          ResponseInitArgs.Headers [| "content-type", contentType |]
+                        [ Status status
+                          Headers [| "content-type", contentType |]
                           yield! args ]
                     )
     }
@@ -208,7 +208,7 @@ let sendHtmlFile (path: string) : HttpHandler =
     fun next ctx ->
         ctx.SetStarted true
         let content = Bun.file (path, unbox {| ``type`` = "text/html" |}), "text/html"
-        let content = BixResponse.Blob content |> Some
+        let content = Blob content |> Some
         Promise.lift content
 
 let cleanResponse: HttpHandler =
