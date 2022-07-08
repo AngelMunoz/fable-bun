@@ -1,9 +1,12 @@
 ﻿// For more information see https://aka.ms/fsharp-console-apps
 
-open Fable.Core.JsInterop
-open Fetch
-
 open Feliz.ViewEngine
+open Fable.Bun
+
+open Fetch
+open Types
+open Bix
+open Bix.Types
 
 type Html with
     static member inline sl_button xs = Interop.createElement "sl-button" xs
@@ -76,18 +79,90 @@ let Home (req: Request) =
 
     Views.Layout(content, [ styles ])
 
-let appHandler: BunHandler =
-    fun req ->
-        let view = Home req |> Render.htmlDocument
-        Response.create (unbox view, {| headers = {| ``content-type`` = "text/html" |} |})
+let checkCredentials: HttpHandler =
+    fun next ctx ->
+
+        promise {
+            printfn "Executing Auth Before"
+            do! (next ctx |> Promise.map ignore)
+            printfn "Executing Auth After"
+            let req: Request = ctx.Request
+
+            let body: {| email: string; password: string |} option =
+                {| email = "email@email"
+                   password = "password" |}
+                |> Some
+
+            match body with
+            | Some body ->
+                if body.email = "email@email"
+                   && body.password = "password" then
+                    return None
+                else
+                    return
+                        (box None,
+                         [ ResponseInitArgs.Status 401
+                           ResponseInitArgs.StatusText "Failed Authentication" ])
+                        |> BixResponse.Custom
+                        |> Some
+            | None ->
+                return
+                    (box None,
+                     [ ResponseInitArgs.Status 401
+                       ResponseInitArgs.StatusText "Failed Authentication" ])
+                    |> BixResponse.Custom
+                    |> Some
+        }
+
+let login: HttpHandler =
+    fun next ctx ->
+        promise {
+            printfn "Executing before"
+            let! response = next ctx
+            printfn "Executing after"
+
+            match response with
+            | None ->
+
+                return
+                    box {| Authed = "Apparenly!" |}
+                    |> BixResponse.Json
+                    |> Some
+            | response -> return response
+        }
+
+let homeHandler: HttpHandler =
+    fun next ctx ->
+        promise {
+            do! next ctx |> Promise.map ignore
+            let view = Home ctx.Request |> Render.htmlDocument
+            return view |> BixResponse.Html |> Some
+        }
+
+let jsonHandler =
+    fun next ctx ->
+        promise {
+            return
+                box {| Hello = "World!" |}
+                |> BixResponse.Json
+                |> Some
+        }
+
 
 [<EntryPoint>]
 let main argv =
     let server =
-        Bix.Server
-        |> Bix.withDevelopment true
-        |> Bix.withFetch appHandler
-        |> Bix.run
+        Server.Bix
+        |> Server.withDevelopment true
+        |> Server.withBixHandler (
+            Router.Empty
+            |> Router.get ("/", homeHandler)
+            |> Router.get ("/json", jsonHandler)
+            // TEST: THIS THING LOOKS BROKEN
+            |> Router.get ("/login", (checkCredentials >=> login))
+            |> Router.get ("/text", (fun next ctx -> promise { return "Hello, World!" |> BixResponse.Text |> Some }))
+        )
+        |> Server.run
 
     let mode =
         if server.development then
