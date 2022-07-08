@@ -4,17 +4,14 @@
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Types.fs" />
-    <Compile Include="Extensions.fs" />
-    <Compile Include="BixRouter.fs" />
-    <Compile Include="Bix.fs" />
+    <Compile Include="Handlers.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Bix\Bix.fsproj" />
     <ProjectReference Include="..\Fable.Bun\Fable.Bun.fsproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Fable.Browser.Url" Version="1.1.0" />
     <PackageReference Include="Feliz.ViewEngine" Version="0.24.0" />
   </ItemGroup>
 </Project>
