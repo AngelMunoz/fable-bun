@@ -7,9 +7,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8E6E0562-469
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Fable.Bun", "src\Fable.Bun\Fable.Bun.fsproj", "{5387557E-4C49-4BE6-B428-956C6BBC8F18}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Fable.Bun.Sample", "src\Fable.Bun.Sample\Fable.Bun.Sample.fsproj", "{5940FFA0-0D0A-461A-A489-8E3FD959A511}"
-EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Bix", "src\Bix\Bix.fsproj", "{F27118FF-7DF9-4FDE-94FD-1DEBD22B3C6C}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Fable.Bun.Sample", "src\Fable.Bun.Sample\Fable.Bun.Sample.fsproj", "{5940FFA0-0D0A-461A-A489-8E3FD959A511}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
