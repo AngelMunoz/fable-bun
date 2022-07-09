@@ -18,8 +18,8 @@ type BixServerArgs =
     | DhParamsFile of string
     | LowMemoryMode of bool
     | ServerNames of (string * BixServerArgs list) list
-    | Fetch of req: (Request -> U2<Response, JS.Promise<Response>>)
-    | Error of req: (exn -> U2<Response, JS.Promise<Response>>)
+    | Fetch of req: BunHandler
+    | Error of req: BunErrorHandler
 
 type BixResponse =
     | Text of string
