@@ -6,13 +6,14 @@ let main argv =
     let server =
         Server.Empty
         |> Server.withDevelopment true
+        |> Server.withPort 5000
         |> Server.withBixRouter (
             Router.Empty
             |> Router.get ("/", Handlers.home)
             |> Router.get ("/json", Handlers.json)
+            |> Router.post ("/json", Handlers.jsonPostHandler)
             |> Router.get ("/text", Handlers.text)
             |> Router.get ("/login", Handlers.login)
-            // TEST: THIS THING LOOKS BROKEN
             |> Router.get ("/protected", (Handlers.checkCredentials >=> Handlers.home))
         )
         |> Server.run

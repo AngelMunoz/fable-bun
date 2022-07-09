@@ -82,8 +82,6 @@ let Home (req: Request) =
 let checkCredentials: HttpHandler =
     fun next ctx ->
         let req: Request = ctx.Request
-        Fable.Core.JS.console.log (req.headers.get)
-
         let bearer = req.headers.get "Authorization" |> Option.ofObj
         Fable.Core.JS.console.log (bearer)
 
@@ -118,3 +116,16 @@ let home: HttpHandler =
 let json: HttpHandler = Server.sendJson {| Hello = "World!" |}
 
 let text: HttpHandler = Server.sendText "Hello, World!"
+
+let jsonPostHandler: HttpHandler =
+    fun next ctx ->
+        let req: Request = ctx.Request
+
+        req.json ()
+        |> Promise.bind (fun res ->
+            let content =
+                res
+                |> Option.ofObj
+                |> Fable.Core.JS.JSON.stringify
+
+            Server.sendJson content next ctx)
