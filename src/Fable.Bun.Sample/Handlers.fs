@@ -2,7 +2,7 @@ module Handlers
 
 open Bix
 open Bix.Types
-open Fable.Bun
+open Bix.Handlers
 open Feliz.ViewEngine
 open Fetch
 
@@ -86,36 +86,31 @@ let checkCredentials: HttpHandler =
         Fable.Core.JS.console.log (bearer)
 
         match bearer with
-        | None ->
-            (Server.setStatusCode (401)
-             >=> Server.sendText "Not Authorized")
-                next
-                ctx
+        | None -> (setStatusCode (401) >=> sendText "Not Authorized") next ctx
         | Some token ->
             match token.Split(" ") with
             | [| "Bearer"; token |] ->
                 if token = "yeah.come.in" then
                     next ctx
                 else
-                    (Server.setStatusCode (401)
-                     >=> Server.sendText "Invalid Credentials")
+                    (setStatusCode (401)
+                     >=> sendText "Invalid Credentials")
                         next
                         ctx
             | _ ->
-                (Server.setStatusCode (400)
-                 >=> Server.sendText "Wrong Bearer Format")
+                (setStatusCode (400)
+                 >=> sendText "Wrong Bearer Format")
                     next
                     ctx
 
-
-let login: HttpHandler = Server.sendJson {| Authed = "Apparenly!" |}
+let login: HttpHandler = sendJson {| Authed = "Apparenly!" |}
 
 let home: HttpHandler =
-    fun next ctx -> Server.sendHtml (Home ctx.Request |> Render.htmlDocument) next ctx
+    fun next ctx -> sendHtml (Home ctx.Request |> Render.htmlDocument) next ctx
 
-let json: HttpHandler = Server.sendJson {| Hello = "World!" |}
+let json: HttpHandler = sendJson {| Hello = "World!" |}
 
-let text: HttpHandler = Server.sendText "Hello, World!"
+let text: HttpHandler = sendText "Hello, World!"
 
 let jsonPostHandler: HttpHandler =
     fun next ctx ->
@@ -128,4 +123,23 @@ let jsonPostHandler: HttpHandler =
                 |> Option.ofObj
                 |> Fable.Core.JS.JSON.stringify
 
-            Server.sendJson content next ctx)
+            sendJson content next ctx)
+
+let paramsHandler: HttpHandler =
+    fun next ctx ->
+        let nameAny = ctx.AnyParams "name"
+        let valueAny = ctx.AnyParams "value"
+        let namePath = ctx.PathParams "name"
+        let valuePath = ctx.PathParams "value"
+        let searchParams = ctx.SearchParams
+        let searchAny = ctx.AnyParams "age"
+
+        let content =
+            $"""{nameof nameAny} - {nameAny}
+{nameof valueAny} - {valueAny}
+{nameof namePath} - {namePath}
+{nameof valuePath} - {valuePath}
+{nameof searchParams} - {searchParams}
+{nameof searchAny} - {searchAny}"""
+
+        sendText content next ctx
