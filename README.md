@@ -36,7 +36,7 @@ let checkCredentials: HttpHandler =
 
 let routes =
     Router.Empty
-    |> Router.get ("/", fun next ctx -> sendText "Hello, World!")
+    |> Router.get ("/", fun next ctx -> sendText "Hello, World!" next ctx)
     |> Router.get ("/posts/:slug", fun next ctx ->
         promise { // promise based handlers are supported
             let slug = ctx.PathParams "slug"
@@ -47,9 +47,9 @@ let routes =
     )
     |> Router.get ("/json", fun next ctx ->
         let content = {| name = "Bix Server!"; Date = System.DateTime.Now |}
-        return! sendJson content next ctx
+        sendJson content next ctx
     )
-    |> Router.get ("/protected", (checkCredentials >=> (fun next ctx -> sendText "I'm protected!")))
+    |> Router.get ("/protected", (checkCredentials >=> (fun next ctx -> sendText "I'm protected!" next ctx)))
 
 let server =
     Server.Empty
