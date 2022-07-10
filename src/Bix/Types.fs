@@ -1,9 +1,12 @@
 module Bix.Types
 
 open Fable.Core
+open Fable.Core.JsInterop
+open Fable.Core.DynamicExtensions
 open Browser.Types
 open Fetch
 open Fable.Bun
+open URLPattern
 
 type BixServerArgs =
     | Port of int
@@ -28,19 +31,66 @@ type BixResponse =
     | ArrayBuffer of content: JS.ArrayBuffer * mimeType: string
     | ArrayBufferView of content: JS.ArrayBufferView * mimeType: string
     | Json of obj
+    | JsonOptions of obj * (obj -> string)
     | Custom of obj * ResponseInitArgs list
 
 [<AttachMembers>]
 type HttpContext(server: BunServer, req: Request, res: Response) =
     let mutable _res = res
     let mutable hasStarted = false
+
+    let mutable patternResult: URLPatternResult option = None
+
     member _.Request: Request = req
     member _.Server: BunServer = server
     member _.Response: Response = _res
     member _.HasStarted: bool = hasStarted
+    member _.RoutePattern: URLPatternResult option = patternResult
     member _.SetStarted(setStarted: bool) = hasStarted <- setStarted
 
     member _.SetResponse(response: Response) = _res <- response
+
+    member internal _.SetPattern(pattern: URLPatternResult option) = patternResult <- pattern
+
+    member _.SearchParams: Map<string, string option> =
+        match patternResult with
+        | Some result ->
+            let strings = (result.search.groups["0"] :?> string).Split("&")
+
+            seq {
+                for kv in strings do
+                    let values = kv.Split("=")
+
+                    match values with
+                    | [| key; value |] -> (key, Some value)
+                    | [| key |] -> (key, None)
+                    | values -> ("__values", Some(System.String.Join(",", values)))
+            }
+            |> Map.ofSeq
+        | None -> Map.empty
+
+    member _.PathParams(index: string) : string option =
+        match patternResult with
+        | Some result ->
+            result.pathname.groups.Item index :?> string
+            |> Option.ofObj
+        | None -> None
+
+    member _.HashParams(index: string) : string option =
+        match patternResult with
+        | Some result ->
+            result.hash.groups.Item index :?> string
+            |> Option.ofObj
+        | None -> None
+
+    member this.AnyParams(index: string) : string option =
+        this.PathParams index
+        |> Option.orElseWith (fun _ ->
+            this.SearchParams
+            |> Map.tryFind index
+            |> Option.flatten)
+        |> Option.orElseWith (fun _ -> this.HashParams index)
+
 
 type HttpFuncResult = JS.Promise<BixResponse option>
 
@@ -56,6 +106,7 @@ type RouteType =
     | Patch
     | Head
     | Options
+    | All
     | Custom of string
 
     static member FromString s =
@@ -67,6 +118,27 @@ type RouteType =
         | "PATCH" -> Patch
         | "HEAD" -> Head
         | "OPTIONS" -> Options
+        | "ALL" -> All
         | custom -> Custom custom
+
+    member this.asString =
+        match this with
+        | Get -> "GET"
+        | Post -> "POST"
+        | Put -> "PUT"
+        | Delete -> "DELETE"
+        | Patch -> "PATCH"
+        | Head -> "HEAD"
+        | Options -> "OPTIONS"
+        | All -> "ALL"
+        | Custom custom -> custom
+
+
+type RouteDefinition =
+    { method: RouteType
+      pattern: URLPatternInput
+      handler: HttpHandler }
+
+type RouteList = RouteDefinition list
 
 type RouteMap = Map<RouteType * string, HttpHandler>
