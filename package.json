@@ -6,7 +6,10 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "prestart": "dotnet tool restore",
+    "prestart": "bun install && dotnet tool restore",
     "start": "dotnet fable watch src/Fable.Bun.Sample -s -o dist/Fable.Bun.Sample --runWatch bun ./dist/Fable.Bun.Sample/Program.js"
+  },
+  "dependencies": {
+    "urlpattern-polyfill": "~5.0.3"
   }
 }
