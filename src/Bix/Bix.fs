@@ -7,6 +7,7 @@ open Browser.Types
 open Fetch
 open Bix.Types
 open Fable.Bun
+open URLPattern
 
 
 [<Emit "new URL($0)">]
@@ -101,132 +102,136 @@ let inline run (args: seq<BixServerArgs>) =
         Bun.serve (unbox options)
     | None -> Bun.serve (unbox restArgs)
 
-let sendJson<'T> (value: 'T) : HttpHandler =
-    fun next ctx ->
-        ctx.SetStarted true
-        Promise.lift (Some(BixResponse.Json value))
+let private NoValue (contentType: string, options: ResponseInitArgs list) =
+    Response.create (
+        "",
+        Headers [| "content-type", contentType |]
+        :: options
+    )
 
-let sendText (value: string) : HttpHandler =
-    fun next ctx ->
-        ctx.SetStarted true
-        Promise.lift (Some(Text value))
+let private OnText (text: string, options: ResponseInitArgs list) =
+    Response.create (
+        text,
+        Headers [| "content-type", "text/plain" |]
+        :: options
+    )
 
-let sendHtml (value: string) : HttpHandler =
-    fun next ctx ->
-        ctx.SetStarted true
-        Promise.lift (Some(Html value))
+let private OnHtml (html: string, options: ResponseInitArgs list) =
+    Response.create (
+        html,
+        Headers [| "content-type", "text/html" |]
+        :: options
+    )
 
-let sendHtmlFile (path: string) : HttpHandler =
-    fun next ctx ->
-        ctx.SetStarted true
-        let content = Bun.file (path, unbox {| ``type`` = "text/html" |}), "text/html"
-        let content = Blob content |> Some
-        Promise.lift content
+let private OnJson (json: obj, options: ResponseInitArgs list) =
+    let content = JS.JSON.stringify (json)
 
-let cleanResponse: HttpHandler =
-    fun next ctx ->
-        ctx.SetStarted true
-        ctx.SetResponse(Response.create ("", []))
-        Promise.lift None
+    Response.create (
+        content,
+        Headers [| "content-type", "application/json" |]
+        :: options
+    )
 
-let setContentType (contentType: string) : HttpHandler =
-    fun next ctx ->
-        let headers = ctx.Response.Headers
-        headers.append ("content-type", contentType)
+let private OnJsonOptions (value: obj, encoder: obj -> string, options: ResponseInitArgs list) =
 
-        let res =
-            createResponseInit
-                ""
-                {| headers = headers
-                   status = ctx.Response.Status
-                   statusText = ctx.Response.StatusText |}
+    Response.create (
+        encoder value,
+        Headers [| "content-type", "application/json" |]
+        :: options
+    )
 
-        ctx.SetResponse(res)
-        next ctx
+let private OnBlob (blob: Blob, mimeType: string, options: ResponseInitArgs list) =
+    Response.create (blob, Headers [| "content-type", mimeType |] :: options)
 
-let setStatusCode (code: int) : HttpHandler =
-    fun next ctx ->
-        let headers = ctx.Response.Headers
+let private OnArrayBuffer (arrayBuffer: JS.ArrayBuffer, mimeType: string, options: ResponseInitArgs list) =
+    Response.create (arrayBuffer, Headers [| "content-type", mimeType |] :: options)
 
-        let res =
-            createResponseInit
-                ""
-                {| headers = headers
-                   status = code
-                   statusText = ctx.Response.StatusText |}
+let private OnArrayBufferView (arrayBufferView: JS.ArrayBufferView, mimeType: string, options: ResponseInitArgs list) =
+    Response.create (arrayBufferView, Headers [| "content-type", mimeType |] :: options)
 
-        ctx.SetResponse(res)
-        next ctx
+let private OnCustom (content, contentType, args) =
+    Response.create (
+        // it might not be a string but
+        // it is just to satisfy the F# compiler
+        unbox<string> content,
+        Headers [| "content-type", contentType |] :: args
+    )
 
-let notFoundHandler: HttpHandler = setStatusCode 404 >=> sendText "Not Found"
+let BixHandler
+    (server: BunServer)
+    (req: Request)
+    (routes: RouteDefinition list)
+    (notFound: HttpHandler option)
+    : JS.Promise<Response> =
+    let method = RouteType.FromString req.method
+    let notFound = defaultArg notFound Handlers.notFoundHandler
 
-let BixHandler (server: BunServer) (routes: RouteMap) (req: Request) : JS.Promise<Response> =
+    let patternOptions route =
+        !!{| pathname = route.pattern
+             baseURL = server.hostname
+             search = "*"
+             hash = "*" |}
+
+    let route =
+        routes
+        |> List.tryFind (fun route ->
+            URLPattern(patternOptions route)
+                .test (unbox req.url))
+
     let ctx = HttpContext(server, req, createResponseInit "" {|  |})
-    let url = createUrl req.url
-    let verb = RouteType.FromString req.method
 
-    let handler = routes |> Map.tryFind (verb, url.pathname)
+    match route with
+    | Some route ->
+        let pattern = URLPattern(patternOptions route)
 
-    let status = ctx.Response.Status
-
-    let contentType =
-        ctx.Response.Headers.ContentType
-        |> Option.defaultValue "text/plain"
-
-    let options = [ Status status ]
-
-    match handler with
-    | Some handler -> handler (fun _ -> Promise.lift None) ctx
-    | None -> notFoundHandler (fun _ -> Promise.lift None) ctx
-    |> Promise.map (fun res ->
-        match res with
-        | None ->
+        if route.method = All then
+            pattern.exec (!!req.url) |> ctx.SetPattern
+            route.handler (fun _ -> Promise.lift None) ctx
+        elif (route.method <> All) && route.method <> method then
             Response.create (
                 "",
-                Headers [| "content-type", contentType |]
-                :: options
+                [ Status 405
+                  StatusText "Method Not Allowed" ]
             )
+        else
+            pattern.exec (!!req.url) |> ctx.SetPattern
+            route.handler (fun _ -> Promise.lift None) ctx
+
+    | None -> notFound (fun _ -> Promise.lift None) ctx
+    |> Promise.map (fun res ->
+        let status = ctx.Response.Status
+
+        let contentType =
+            ctx.Response.Headers.ContentType
+            |> Option.defaultValue "text/plain"
+
+        let options = [ Status status ]
+
+        match res with
+        | None -> NoValue(contentType, options)
         | Some result ->
             match result with
-            | Text value ->
-                Response.create (
-                    value,
-                    Headers [| "content-type", "text/plain" |]
-                    :: options
-                )
-            | Html value ->
-                Response.create (
-                    value,
-                    Headers [| "content-type", "text/html" |]
-                    :: options
-                )
-            | Json value ->
-                let content = JS.JSON.stringify (value)
+            | Text value -> OnText(value, options)
+            | Html value -> OnHtml(value, options)
+            | Json value -> OnJson(value, options)
+            | JsonOptions (value, encoder) -> OnJsonOptions(value, encoder, options)
+            | Blob (content, mimeType) -> OnBlob(content, mimeType, options)
+            | ArrayBufferView (content, mimeType) -> OnArrayBufferView(content, mimeType, options)
+            | ArrayBuffer (content, mimeType) -> OnArrayBuffer(content, mimeType, options)
+            | BixResponse.Custom (content, args) -> OnCustom(content, contentType, Status status :: options @ args))
 
-                Response.create (
-                    content,
-                    Headers [| "content-type", "application/json" |]
-                    :: options
-                )
-            | Blob (content, mimeType) -> Response.create (content, Headers [| "content-type", mimeType |] :: options)
-            | ArrayBufferView (content, mimeType) ->
-                Response.create (content, Headers [| "content-type", mimeType |] :: options)
-            | ArrayBuffer (content, mimeType) ->
-                Response.create (content, Headers [| "content-type", mimeType |] :: options)
-            | BixResponse.Custom (content, args) ->
-                Response.create (
-                    // it might not be a string but
-                    // it is just to satisfy the F# compiler
-                    unbox<string> content,
-                    [ Status status
-                      Headers [| "content-type", contentType |]
-                      yield! args ]
-                ))
-
-let withBixRouter (routes: RouteMap) (args: ResizeArray<BixServerArgs>) =
+let withRouter (routes: RouteDefinition list) (args: ResizeArray<BixServerArgs>) =
     // HACK: we need to ensure that fable doesn't wrap the request handler
     // in an anonymnous function or we will lose "this" which equates to the
     // bun's server instance
-    emitJsStatement (routes) "function handler(req) { return BixHandler(this, $0, req); }"
+    emitJsStatement (routes) "function handler(req) { return BixHandler(this, req, $0); }"
+    args.Add(Fetch(emitJsExpr () "handler"))
+    args
+
+let withRouterAndNotFound (routes: RouteDefinition list) (notFound: HttpHandler) (args: ResizeArray<BixServerArgs>) =
+    // HACK: we need to ensure that fable doesn't wrap the request handler
+    // in an anonymnous function or we will lose "this" which equates to the
+    // bun's server instance
+    emitJsStatement (routes, notFound) "function handler(req) { return BixHandler(this, req, $0, $1); }"
     args.Add(Fetch(emitJsExpr () "handler"))
     args
