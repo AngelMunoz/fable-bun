@@ -158,10 +158,30 @@ This project is developed with VSCode in Linux/Windows/WSL but either rider, and
 ## Requirements
 
 - .NET6 and above - https://get.dot.net
-- Bun - [bun.sh]
+- Bun - [bun.sh] - (in case of running bun)
+- Deno - [bun.sh] - (in case of running deno)
 
 ## Try the sample
+
+if you have bun installed along deno the simplest way to run the samples is
+
+- `bun start`
+- `bun start:deno`
+
+both commands will restore the projects and run fable, bun/deno in watch mode
+
+
+### Bun
 
 After installing .NET + Bun just run
 
 `bun start` on your terminal and it should just work
+
+### Deno
+
+After installing .NET + Bun just run
+```sh
+dotnet tool restore && \
+dotnet fable watch src/Bix.Deno.Sample -s -o dist/Bix.Deno.Sample --run deno run -A ./dist/Bix.Deno.Sample/Program.js`
+```
+
