@@ -8,6 +8,7 @@ open Fetch
 
 open Bix.Browser.Types
 open Bix.Types
+open Bix.Handlers
 
 
 let Empty = ResizeArray<BixServerArgs>()
@@ -109,3 +110,31 @@ let getRouteMatch (ctx: HttpContext, baseUrl: string, notFound: HttpHandler, rou
         | Some MethodNotAllowed -> Handlers.setStatusCode 405 (fun _ -> Promise.lift None) ctx
         | None
         | Some NotFound -> notFound (fun _ -> Promise.lift None) ctx
+
+let handleRouteMatch (ctx: HttpContext) (bixResponse: JS.Promise<BixResponse option>) : JS.Promise<Response> =
+    let status = ctx.Response.Status
+
+    let contentType =
+        ctx.Response.Headers.ContentType
+        |> Option.defaultValue "text/plain"
+
+    let options = [ Status status ]
+
+    promise {
+        let! response = bixResponse
+
+        return
+            match response with
+            | None -> BixResponse.NoValue(contentType, options)
+            | Some result ->
+                match result with
+                | Text value -> BixResponse.OnText(value, options)
+                | Html value -> BixResponse.OnHtml(value, options)
+                | Json value -> BixResponse.OnJson(value, options)
+                | JsonOptions (value, encoder) -> BixResponse.OnJsonOptions(value, encoder, options)
+                | Blob (content, mimeType) -> BixResponse.OnBlob(content, mimeType, options)
+                | ArrayBufferView (content, mimeType) -> BixResponse.OnArrayBufferView(content, mimeType, options)
+                | ArrayBuffer (content, mimeType) -> BixResponse.OnArrayBuffer(content, mimeType, options)
+                | BixResponse.Custom (content, args) ->
+                    BixResponse.OnCustom(content, contentType, Status status :: options @ args)
+    }
