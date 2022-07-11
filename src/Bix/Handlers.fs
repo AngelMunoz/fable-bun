@@ -1,8 +1,9 @@
 module Bix.Handlers
 
 open Fetch
-open Fable.Bun
 open Bix.Types
+open Bix.Browser.Types
+
 
 
 let sendJson<'T> (value: 'T) : HttpHandler =
@@ -27,25 +28,18 @@ let sendHtml (value: string) : HttpHandler =
         ctx.SetStarted true
         Promise.lift (Some(Html value))
 
-let sendHtmlFile (path: string) : HttpHandler =
-    fun next ctx ->
-        ctx.SetStarted true
-        let content = Bun.file (path, unbox {| ``type`` = "text/html" |}), "text/html"
-        let content = Blob content |> Some
-        Promise.lift content
-
-
 let setContentType (contentType: string) : HttpHandler =
     fun next ctx ->
         let headers = ctx.Response.Headers
         headers.append ("content-type", contentType)
 
         let res =
-            createResponseInit
-                ""
+            createResponseInit (
+                "",
                 {| headers = headers
                    status = ctx.Response.Status
                    statusText = ctx.Response.StatusText |}
+            )
 
         ctx.SetResponse(res)
         next ctx
@@ -55,16 +49,18 @@ let setStatusCode (code: int) : HttpHandler =
         let headers = ctx.Response.Headers
 
         let res =
-            createResponseInit
-                ""
+            createResponseInit (
+                "",
                 {| headers = headers
                    status = code
                    statusText = ctx.Response.StatusText |}
+            )
 
         ctx.SetResponse(res)
         next ctx
 
-let notFoundHandler: HttpHandler = setStatusCode 404 >=> sendText "Not Found"
+let notFoundHandler: HttpHandler =
+    fun next ctx -> (setStatusCode 404 >=> sendText "Not Found") next ctx
 
 let cleanResponse: HttpHandler =
     fun next ctx ->

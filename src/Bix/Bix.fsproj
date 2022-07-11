@@ -4,7 +4,6 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="URLPattern.fs" />
     <Compile Include="Types.fs" />
     <Compile Include="Extensions.fs" />
     <Compile Include="Handlers.fs" />
@@ -12,10 +11,6 @@
     <Compile Include="Router.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Fable.Bun\Fable.Bun.fsproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Fable.Browser.Url" Version="1.1.0" />
-    <PackageReference Include="Fable.Core" Version="3.7.1" />
+    <ProjectReference Include="..\Bix.Browser.Types\Bix.Browser.Types.fsproj" />
   </ItemGroup>
 </Project>

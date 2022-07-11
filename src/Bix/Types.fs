@@ -5,7 +5,6 @@ open Fable.Core.JsInterop
 open Fable.Core.DynamicExtensions
 open Browser.Types
 open Fetch
-open Fable.Bun
 open URLPattern
 
 type BixServerArgs =
@@ -21,8 +20,8 @@ type BixServerArgs =
     | DhParamsFile of string
     | LowMemoryMode of bool
     | ServerNames of (string * BixServerArgs list) list
-    | Fetch of req: BunHandler
-    | Error of req: BunErrorHandler
+    | Fetch of req: RequestHandler
+    | Error of req: RequestErrorHandler
 
 type BixResponse =
     | Text of string
@@ -34,15 +33,21 @@ type BixResponse =
     | JsonOptions of obj * (obj -> string)
     | Custom of obj * ResponseInitArgs list
 
+type IHostServer =
+    abstract hostname: string option
+    abstract port: int
+    abstract development: bool
+    abstract env: Map<string, string>
+
 [<AttachMembers>]
-type HttpContext(server: BunServer, req: Request, res: Response) =
+type HttpContext(server: IHostServer, req: Request, res: Response) =
     let mutable _res = res
     let mutable hasStarted = false
 
     let mutable patternResult: URLPatternResult option = None
 
     member _.Request: Request = req
-    member _.Server: BunServer = server
+    member _.Server: IHostServer = server
     member _.Response: Response = _res
     member _.HasStarted: bool = hasStarted
     member _.RoutePattern: URLPatternResult option = patternResult
@@ -50,7 +55,7 @@ type HttpContext(server: BunServer, req: Request, res: Response) =
 
     member _.SetResponse(response: Response) = _res <- response
 
-    member internal _.SetPattern(pattern: URLPatternResult option) = patternResult <- pattern
+    member _.SetPattern(pattern: URLPatternResult option) = patternResult <- pattern
 
     member _.SearchParams: Map<string, string option> =
         match patternResult with
@@ -142,3 +147,8 @@ type RouteDefinition =
 type RouteList = RouteDefinition list
 
 type RouteMap = Map<RouteType * string, HttpHandler>
+
+type RouteMatch =
+    | Found of RouteDefinition
+    | NotFound
+    | MethodNotAllowed

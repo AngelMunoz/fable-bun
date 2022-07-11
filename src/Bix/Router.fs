@@ -1,26 +1,7 @@
 module Bix.Router
 
 open Bix.Types
-
-type UrlInitArgs =
-    | BaseURL of string
-    | Username of string
-    | Password of string
-    | Protocol of string
-    | Hostname of string
-    | Port of string
-    | Pathname of string
-    | Search of string
-    | Hash of string
-
-[<RequireQualifiedAccess>]
-module UrlPatternInit =
-    let inline fromArgs (args: UrlInitArgs list) : UrlPatternInit =
-        let args =
-            args
-            |> Fable.Core.JsInterop.keyValueList Fable.Core.CaseRules.LowerFirst
-
-        unbox<UrlPatternInit> args
+open Bix.Browser.Types
 
 let Empty = List.empty
 

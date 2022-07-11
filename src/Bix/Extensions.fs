@@ -1,14 +1,9 @@
 [<AutoOpen>]
 module Extensions
 
-open Fable.Core
 open Bix.Types
-
-[<Emit("{...$0, ...$1}")>]
-let inline mergeObjects (o1, o2) = jsNative
-
-[<Emit("new Response($0, $1)")>]
-let inline internal createResponseInit (content: obj) (options: obj) = jsNative
+open Browser.Types
+open Bix.Browser.Types
 
 let compose (h1: HttpHandler) (h2: HttpHandler) : HttpHandler =
     fun final ->
