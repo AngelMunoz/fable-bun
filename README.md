@@ -159,7 +159,7 @@ This project is developed with VSCode in Linux/Windows/WSL but either rider, and
 
 - .NET6 and above - https://get.dot.net
 - Bun - [bun.sh] - (in case of running bun)
-- Deno - [bun.sh] - (in case of running deno)
+- Deno - [deno] - (in case of running deno)
 
 ## Try the sample
 
