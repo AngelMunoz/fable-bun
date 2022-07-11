@@ -9,9 +9,10 @@ open Fable.Bun
 open Browser.Types
 open Fetch
 
+open Bix.Browser.Types
 open Bix
 open Bix.Types
-open Bix.Browser.Types
+open Bix.Handlers
 
 type BixBunServer(server: BunServer) =
 
@@ -52,67 +53,6 @@ module Server =
             Bun.serve (unbox options)
         | None -> Bun.serve (unbox restArgs)
 
-
-    let private NoValue (contentType: string, options: ResponseInitArgs list) =
-        Response.create (
-            "",
-            Headers [| "content-type", contentType |]
-            :: options
-        )
-
-    let private OnText (text: string, options: ResponseInitArgs list) =
-        Response.create (
-            text,
-            Headers [| "content-type", "text/plain" |]
-            :: options
-        )
-
-    let private OnHtml (html: string, options: ResponseInitArgs list) =
-        Response.create (
-            html,
-            Headers [| "content-type", "text/html" |]
-            :: options
-        )
-
-    let private OnJson (json: obj, options: ResponseInitArgs list) =
-        let content = JS.JSON.stringify (json)
-
-        Response.create (
-            content,
-            Headers [| "content-type", "application/json" |]
-            :: options
-        )
-
-    let private OnJsonOptions (value: obj, encoder: obj -> string, options: ResponseInitArgs list) =
-
-        Response.create (
-            encoder value,
-            Headers [| "content-type", "application/json" |]
-            :: options
-        )
-
-    let private OnBlob (blob: Blob, mimeType: string, options: ResponseInitArgs list) =
-        Response.create (blob, Headers [| "content-type", mimeType |] :: options)
-
-    let private OnArrayBuffer (arrayBuffer: JS.ArrayBuffer, mimeType: string, options: ResponseInitArgs list) =
-        Response.create (arrayBuffer, Headers [| "content-type", mimeType |] :: options)
-
-    let private OnArrayBufferView
-        (
-            arrayBufferView: JS.ArrayBufferView,
-            mimeType: string,
-            options: ResponseInitArgs list
-        ) =
-        Response.create (arrayBufferView, Headers [| "content-type", mimeType |] :: options)
-
-    let private OnCustom (content, contentType, args) =
-        Response.create (
-            // it might not be a string but
-            // it is just to satisfy the F# compiler
-            unbox<string> content,
-            Headers [| "content-type", contentType |] :: args
-        )
-
     let BixHandler
         (server: BunServer)
         (req: Request)
@@ -125,27 +65,7 @@ module Server =
         let ctx = HttpContext(server, req, createResponseInit ("", {|  |}))
 
         Server.getRouteMatch (ctx, server.hostname.Value, notFound, routes)
-        |> Promise.map (fun res ->
-            let status = ctx.Response.Status
-
-            let contentType =
-                ctx.Response.Headers.ContentType
-                |> Option.defaultValue "text/plain"
-
-            let options = [ Status status ]
-
-            match res with
-            | None -> NoValue(contentType, options)
-            | Some result ->
-                match result with
-                | Text value -> OnText(value, options)
-                | Html value -> OnHtml(value, options)
-                | Json value -> OnJson(value, options)
-                | JsonOptions (value, encoder) -> OnJsonOptions(value, encoder, options)
-                | Blob (content, mimeType) -> OnBlob(content, mimeType, options)
-                | ArrayBufferView (content, mimeType) -> OnArrayBufferView(content, mimeType, options)
-                | ArrayBuffer (content, mimeType) -> OnArrayBuffer(content, mimeType, options)
-                | BixResponse.Custom (content, args) -> OnCustom(content, contentType, Status status :: options @ args))
+        |> Server.handleRouteMatch ctx
 
     let withRouter (routes: RouteDefinition list) (args: ResizeArray<BixServerArgs>) =
         // HACK: we need to ensure that fable doesn't wrap the request handler
