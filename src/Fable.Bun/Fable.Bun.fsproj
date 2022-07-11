@@ -15,4 +15,8 @@
     <PackageReference Include="Fable.Fetch" Version="2.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Bix.Browser.Types\Bix.Browser.Types.fsproj" />
+  </ItemGroup>
+
 </Project>

@@ -118,10 +118,7 @@ let jsonPostHandler: HttpHandler =
 
         req.json ()
         |> Promise.bind (fun res ->
-            let content =
-                res
-                |> Option.ofObj
-                |> Fable.Core.JS.JSON.stringify
+            let content = res |> Option.ofObj
 
             sendJson content next ctx)
 

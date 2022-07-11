@@ -31,7 +31,7 @@ type URLPatternResult =
     abstract search: URLPatternComponentResult
     abstract hash: URLPatternComponentResult
 
-[<ImportMember "urlpattern-polyfill">]
+[<Global; Erase>]
 type URLPattern(?init: URLPatternInput, ?baseURL: string) =
 
     member _.test(?input: URLPatternInput, ?baseURL: string) : bool = jsNative
@@ -44,3 +44,23 @@ type URLPattern(?init: URLPatternInput, ?baseURL: string) =
     member _.pathname: string = jsNative
     member _.search: string = jsNative
     member _.hash: string = jsNative
+
+type UrlInitArgs =
+    | BaseURL of string
+    | Username of string
+    | Password of string
+    | Protocol of string
+    | Hostname of string
+    | Port of string
+    | Pathname of string
+    | Search of string
+    | Hash of string
+
+[<RequireQualifiedAccess>]
+module UrlPatternInit =
+    let inline fromArgs (args: UrlInitArgs list) : UrlPatternInit =
+        let args =
+            args
+            |> Fable.Core.JsInterop.keyValueList Fable.Core.CaseRules.LowerFirst
+
+        unbox<UrlPatternInit> args
