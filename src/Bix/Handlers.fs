@@ -1,6 +1,9 @@
 module Bix.Handlers
 
+open Fable.Core
 open Fetch
+open Browser.Types
+
 open Bix.Types
 open Bix.Browser.Types
 
@@ -105,3 +108,62 @@ let tryDecodeJson<'T>
             match content with
             | Ok content -> (success content) next ctx
             | Result.Error err -> (error err) next ctx)
+
+
+[<RequireQualifiedAccess>]
+module BixResponse =
+
+    let NoValue (contentType: string, options: ResponseInitArgs list) =
+        Response.create (
+            "",
+            Headers [| "content-type", contentType |]
+            :: options
+        )
+
+    let OnText (text: string, options: ResponseInitArgs list) =
+        Response.create (
+            text,
+            Headers [| "content-type", "text/plain" |]
+            :: options
+        )
+
+    let OnHtml (html: string, options: ResponseInitArgs list) =
+        Response.create (
+            html,
+            Headers [| "content-type", "text/html" |]
+            :: options
+        )
+
+    let OnJson (json: obj, options: ResponseInitArgs list) =
+        let content = JS.JSON.stringify (json)
+
+        Response.create (
+            content,
+            Headers [| "content-type", "application/json" |]
+            :: options
+        )
+
+    let OnJsonOptions (value: obj, encoder: obj -> string, options: ResponseInitArgs list) =
+
+        Response.create (
+            encoder value,
+            Headers [| "content-type", "application/json" |]
+            :: options
+        )
+
+    let OnBlob (blob: Blob, mimeType: string, options: ResponseInitArgs list) =
+        Response.create (blob, Headers [| "content-type", mimeType |] :: options)
+
+    let OnArrayBuffer (arrayBuffer: JS.ArrayBuffer, mimeType: string, options: ResponseInitArgs list) =
+        Response.create (arrayBuffer, Headers [| "content-type", mimeType |] :: options)
+
+    let OnArrayBufferView (arrayBufferView: JS.ArrayBufferView, mimeType: string, options: ResponseInitArgs list) =
+        Response.create (arrayBufferView, Headers [| "content-type", mimeType |] :: options)
+
+    let OnCustom (content, contentType, args) =
+        Response.create (
+            // it might not be a string but
+            // it is just to satisfy the F# compiler
+            unbox<string> content,
+            Headers [| "content-type", contentType |] :: args
+        )
