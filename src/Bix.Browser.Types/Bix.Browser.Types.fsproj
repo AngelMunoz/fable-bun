@@ -22,6 +22,7 @@
     <PackageReference Include="Fable.Browser.Blob" Version="$(FableBrowserBlob)" />
     <PackageReference Include="Fable.Browser.Event" Version="$(FableBrowserEvent)" />
     <PackageReference Include="Fable.Browser.Url" Version="$(FableBrowserUrl)" />
+    <PackageReference Include="Fable.Browser.WebSocket" Version="$(FableBrowserWebSocket)" />
     <PackageReference Include="Fable.Fetch" Version="$(FableFetch)" />
     <PackageReference Include="Fable.Core" Version="$(FableCore)" />
   </ItemGroup>
