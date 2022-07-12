@@ -22,11 +22,6 @@ type ResponseInitArgs =
 [<Emit("new Response($0, $1)")>]
 let inline createResponseInit (content: obj, options: obj) = jsNative
 
-type Request with
-
-    [<Emit "$0.clone()">]
-    member _.clone() : Request = jsNative
-
 type Response with
     static member inline create(content: string, ?options: RequestInit) = createResponseInit (content, options)
     static member inline create(content: Blob, ?options: RequestInit) = createResponseInit (content, options)
@@ -63,23 +58,6 @@ type Response with
 
         createResponseInit (content, opts)
 
-    [<Emit("$0.clone()")>]
-    member _.clone() : Response = jsNative
-
-    [<Emit("$0.json()")>]
-    member _.json<'T>() : JS.Promise<'T> = jsNative
-
-    [<Emit("Response.json($0, $1)")>]
-    static member inline json(?body: obj, ?options: ResponseInit) : Response = jsNative
-
-    [<Emit("Response.json($0, $1)")>]
-    static member inline json(?body: obj, ?options: int) : Response = jsNative
-
-    [<Emit("Response.redirect($0, $1)")>]
-    static member inline redirect(?url: string, ?status: int) : Response = jsNative
-
-    [<Emit("Response.error($0, $1)")>]
-    static member inline error() : Response = jsNative
 
 [<Emit "new URL($0)">]
 let inline createUrl (url: string) : URL = jsNative

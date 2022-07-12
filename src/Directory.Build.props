@@ -25,7 +25,7 @@
         <FableBrowserBlob>1.2.0</FableBrowserBlob>
         <FableBrowserEvent>1.5.0</FableBrowserEvent>
         <FableBrowserUrl>1.1.0</FableBrowserUrl>
-        <FableFetch>2.4.0</FableFetch>
+        <FableFetch>2.5.0</FableFetch>
         <FableCore>3.7.1</FableCore>
   </PropertyGroup>
 </Project>
