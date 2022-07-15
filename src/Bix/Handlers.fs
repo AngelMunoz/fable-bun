@@ -5,8 +5,6 @@ open Fetch
 open Browser.Types
 
 open Bix.Types
-open Bix.Browser.Types
-
 
 
 let sendJson<'T> (value: 'T) : HttpHandler =
@@ -37,11 +35,12 @@ let setContentType (contentType: string) : HttpHandler =
         headers.append ("content-type", contentType)
 
         let res =
-            createResponseInit (
+            Response.create (
                 "",
-                {| headers = headers
-                   status = ctx.Response.Status
-                   statusText = ctx.Response.StatusText |}
+                unbox
+                    {| headers = headers
+                       status = ctx.Response.Status
+                       statusText = ctx.Response.StatusText |}
             )
 
         ctx.SetResponse(res)
@@ -52,11 +51,12 @@ let setStatusCode (code: int) : HttpHandler =
         let headers = ctx.Response.Headers
 
         let res =
-            createResponseInit (
+            Response.create (
                 "",
-                {| headers = headers
-                   status = code
-                   statusText = ctx.Response.StatusText |}
+                unbox
+                    {| headers = headers
+                       status = code
+                       statusText = ctx.Response.StatusText |}
             )
 
         ctx.SetResponse(res)
@@ -113,28 +113,28 @@ let tryDecodeJson<'T>
 [<RequireQualifiedAccess>]
 module BixResponse =
 
-    let NoValue (contentType: string, options: ResponseInitArgs list) =
+    let NoValue (contentType: string, options: ResponseInitProperties list) =
         Response.create (
             "",
             Headers [| "content-type", contentType |]
             :: options
         )
 
-    let OnText (text: string, options: ResponseInitArgs list) =
+    let OnText (text: string, options: ResponseInitProperties list) =
         Response.create (
             text,
             Headers [| "content-type", "text/plain" |]
             :: options
         )
 
-    let OnHtml (html: string, options: ResponseInitArgs list) =
+    let OnHtml (html: string, options: ResponseInitProperties list) =
         Response.create (
             html,
             Headers [| "content-type", "text/html" |]
             :: options
         )
 
-    let OnJson (json: obj, options: ResponseInitArgs list) =
+    let OnJson (json: obj, options: ResponseInitProperties list) =
         let content = JS.JSON.stringify (json)
 
         Response.create (
@@ -143,7 +143,7 @@ module BixResponse =
             :: options
         )
 
-    let OnJsonOptions (value: obj, encoder: obj -> string, options: ResponseInitArgs list) =
+    let OnJsonOptions (value: obj, encoder: obj -> string, options: ResponseInitProperties list) =
 
         Response.create (
             encoder value,
@@ -151,13 +151,18 @@ module BixResponse =
             :: options
         )
 
-    let OnBlob (blob: Blob, mimeType: string, options: ResponseInitArgs list) =
+    let OnBlob (blob: Blob, mimeType: string, options: ResponseInitProperties list) =
         Response.create (blob, Headers [| "content-type", mimeType |] :: options)
 
-    let OnArrayBuffer (arrayBuffer: JS.ArrayBuffer, mimeType: string, options: ResponseInitArgs list) =
+    let OnArrayBuffer (arrayBuffer: JS.ArrayBuffer, mimeType: string, options: ResponseInitProperties list) =
         Response.create (arrayBuffer, Headers [| "content-type", mimeType |] :: options)
 
-    let OnArrayBufferView (arrayBufferView: JS.ArrayBufferView, mimeType: string, options: ResponseInitArgs list) =
+    let OnArrayBufferView
+        (
+            arrayBufferView: JS.ArrayBufferView,
+            mimeType: string,
+            options: ResponseInitProperties list
+        ) =
         Response.create (arrayBufferView, Headers [| "content-type", mimeType |] :: options)
 
     let OnCustom (content, contentType, args) =

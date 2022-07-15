@@ -10,13 +10,13 @@ open Browser.Types
 open Fetch
 
 open Fable.Deno
+open Fable.Deno.Http
 
-open Bix.Browser.Types
 open Bix
 open Bix.Types
 open Bix.Handlers
 
-type BixDenoServer(server: Fable.Deno.Server) =
+type BixDenoServer(server: Server) =
 
     interface IHostServer with
         override _.hostname =
@@ -52,11 +52,11 @@ module Server =
             |> keyValueList CaseRules.LowerFirst
             :?> {| port: int option
                    hostname: string option
-                   error: RequestErrorHandler
-                   fetch: RequestHandler |}
+                   error: exn -> U2<Response, JS.Promise<Response>>
+                   fetch: Request -> U2<Response, JS.Promise<Response>> |}
 
 
-        Fable.Deno.serve (initOptions.fetch, unbox initOptions)
+        Http.serve (initOptions.fetch, unbox initOptions)
 
     let BixHandler
         (server: Server)
@@ -67,8 +67,8 @@ module Server =
         : JS.Promise<Response> =
         let notFound = defaultArg notFound Handlers.notFoundHandler
         let server: IHostServer = BixDenoServer(server)
-        let ctx = HttpContext(server, req, createResponseInit ("", {|  |}))
-        let reqUrl = createUrl ctx.Request.url
+        let ctx = HttpContext(server, req, Response.create (""))
+        let reqUrl = Browser.Url.URL.Create ctx.Request.url
 
         Server.getRouteMatch (ctx, reqUrl.origin, notFound, routes)
         |> Server.handleRouteMatch ctx

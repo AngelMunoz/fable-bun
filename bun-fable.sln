@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8E6E0562-4693-4E52-84CB-E8908D2843CC}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Bix.Browser.Types", "src\Bix.Browser.Types\Bix.Browser.Types.fsproj", "{9DAAC218-CCA1-49D8-A5DF-7A47347E61E7}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Fable.URLPattern", "src\Fable.URLPattern\Fable.URLPattern.fsproj", "{9DAAC218-CCA1-49D8-A5DF-7A47347E61E7}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Fable.Bun", "src\Fable.Bun\Fable.Bun.fsproj", "{5387557E-4C49-4BE6-B428-956C6BBC8F18}"
 EndProject

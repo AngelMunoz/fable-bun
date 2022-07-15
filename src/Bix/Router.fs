@@ -1,7 +1,7 @@
 module Bix.Router
 
+open URLPattern
 open Bix.Types
-open Bix.Browser.Types
 
 let Empty = List.empty
 

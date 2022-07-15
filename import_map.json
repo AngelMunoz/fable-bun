@@ -1,6 +1,5 @@
 {
   "imports": {
-    "urlpattern-polyfill": "https://cdn.skypack.dev/pin/urlpattern-polyfill@v5.0.3-5dMKTgPBkStj8a3hiMD2/mode=imports,min/optimized/urlpattern-polyfill.js",
-    "http": "https://deno.land/std@0.147.0/http/server.ts"
+    "fable-deno-http": "https://deno.land/std/http/mod.ts"
   }
 }

@@ -19,9 +19,4 @@
     <PackageReference Include="Fable.Fetch" Version="$(FableFetch)" />
     <PackageReference Include="Fable.Core" Version="$(FableCore)" />
   </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Bix.Browser.Types\Bix.Browser.Types.fsproj" />
-  </ItemGroup>
-
 </Project>

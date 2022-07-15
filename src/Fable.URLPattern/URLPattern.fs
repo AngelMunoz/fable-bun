@@ -1,7 +1,10 @@
-[<AutoOpen>]
 module URLPattern
 
 open Fable.Core
+
+#if ENABLE_URLPATTERN_POLYFILL
+JsInterop.importSideEffects "urlpattern-polyfill"
+#endif
 
 type URLPatternComponentResult =
     abstract input: string
@@ -61,6 +64,6 @@ module UrlPatternInit =
     let inline fromArgs (args: UrlInitArgs list) : UrlPatternInit =
         let args =
             args
-            |> Fable.Core.JsInterop.keyValueList Fable.Core.CaseRules.LowerFirst
+            |> JsInterop.keyValueList CaseRules.LowerFirst
 
         unbox<UrlPatternInit> args

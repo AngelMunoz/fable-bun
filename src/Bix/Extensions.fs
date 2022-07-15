@@ -2,8 +2,6 @@
 module Extensions
 
 open Bix.Types
-open Browser.Types
-open Bix.Browser.Types
 
 let compose (h1: HttpHandler) (h2: HttpHandler) : HttpHandler =
     fun final ->

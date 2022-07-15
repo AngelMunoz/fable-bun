@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Fable.URLPattern\Fable.URLPattern.fsproj" />
     <ProjectReference Include="..\Bix\Bix.fsproj" />
     <ProjectReference Include="..\Fable.Deno\Fable.Deno.fsproj" />
   </ItemGroup>

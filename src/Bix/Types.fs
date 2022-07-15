@@ -1,11 +1,15 @@
 module Bix.Types
 
+Fable.Core.JsInterop.importSideEffects "urlpattern-polyfill"
+
 open Fable.Core
-open Fable.Core.JsInterop
 open Fable.Core.DynamicExtensions
 open Browser.Types
 open Fetch
 open URLPattern
+
+type RequestHandler = Request -> U2<Response, JS.Promise<Response>>
+type RequestErrorHandler = exn -> U2<Response, JS.Promise<Response>>
 
 type BixServerArgs =
     | Port of int
@@ -31,7 +35,7 @@ type BixResponse =
     | ArrayBufferView of content: JS.ArrayBufferView * mimeType: string
     | Json of obj
     | JsonOptions of obj * (obj -> string)
-    | Custom of obj * ResponseInitArgs list
+    | Custom of obj * ResponseInitProperties list
 
 type IHostServer =
     abstract hostname: string option

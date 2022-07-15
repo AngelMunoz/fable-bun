@@ -6,7 +6,6 @@ open Fable.Core.JsInterop
 open Browser.Types
 open Fetch
 
-open Bix.Browser.Types
 open Bix.Types
 open Bix.Handlers
 

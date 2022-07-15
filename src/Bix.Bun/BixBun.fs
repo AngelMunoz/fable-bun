@@ -9,7 +9,6 @@ open Fable.Bun
 open Browser.Types
 open Fetch
 
-open Bix.Browser.Types
 open Bix
 open Bix.Types
 open Bix.Handlers
@@ -49,8 +48,10 @@ module Server =
 
         match serverNamesObj with
         | Some names ->
-            let options = mergeObjects (restArgs, names)
-            Bun.serve (unbox options)
+            let options =
+                unbox Fable.Core.JS.Constructors.Object.assign ({|  |}, restArgs, names)
+
+            Bun.serve (options)
         | None -> Bun.serve (unbox restArgs)
 
     let BixHandler
@@ -62,7 +63,7 @@ module Server =
 
         let notFound = defaultArg notFound Handlers.notFoundHandler
         let server: IHostServer = BixBunServer(server)
-        let ctx = HttpContext(server, req, createResponseInit ("", {|  |}))
+        let ctx = HttpContext(server, req, Response.create (""))
 
         Server.getRouteMatch (ctx, server.hostname.Value, notFound, routes)
         |> Server.handleRouteMatch ctx

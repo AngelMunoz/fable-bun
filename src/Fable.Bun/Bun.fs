@@ -4,18 +4,20 @@ open System.Collections.Generic
 open Fable.Core
 open Browser.Types
 open Fetch
-open Bix.Browser.Types
+
+type StringOrBuffer = U3<string, JS.TypedArray, JS.ArrayBuffer>
+type BlobPart = U4<string, Blob, JS.ArrayBuffer, JS.ArrayBufferView>
 
 type MMapOptions =
     abstract sync: bool option
     abstract shared: bool option
 
-[<Erase; StringEnum>]
+[<StringEnum>]
 type Editors =
     | [<CompiledName "vscode">] VSCode
     | [<CompiledName "subl">] Submile
 
-[<Erase; StringEnum>]
+[<StringEnum>]
 type DigestEncoding =
     | [<CompiledName "hex">] Hex
     | [<CompiledName "base64">] Base64
@@ -31,8 +33,8 @@ type ServeOptions =
     abstract baseURI: string option
     abstract maxRequestBodySize: float option
     abstract development: bool option
-    abstract fetch: RequestHandler
-    abstract error: RequestErrorHandler option
+    abstract fetch: Request -> U2<Response, JS.Promise<Response>>
+    abstract error: exn -> U2<Response, JS.Promise<Response>>
 
 type SSLOptions =
     abstract keyFile: string
