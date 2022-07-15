@@ -1,6 +1,8 @@
 module Bix.Types
 
+#if ENABLE_URLPATTERN_POLYFILL
 Fable.Core.JsInterop.importSideEffects "urlpattern-polyfill"
+#endif
 
 open Fable.Core
 open Fable.Core.DynamicExtensions

@@ -1,13 +1,10 @@
 module Fable.Deno.Http
 
 open Fable.Deno
-open System.Collections.Generic
 open Fable.Core
-open Fable.Core.JsInterop
 
 open Fetch
 
-open Browser.Types
 open System
 
 type Status =

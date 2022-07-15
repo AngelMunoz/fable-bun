@@ -1,17 +1,13 @@
 ﻿namespace Bix.Bun
 
-open URLPattern
-
 open Fable.Core
 open Fable.Core.JsInterop
 
 open Fable.Bun
-open Browser.Types
 open Fetch
 
 open Bix
 open Bix.Types
-open Bix.Handlers
 
 type BixBunServer(server: BunServer) =
 

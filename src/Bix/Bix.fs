@@ -3,7 +3,6 @@ module Bix.Server
 open URLPattern
 open Fable.Core
 open Fable.Core.JsInterop
-open Browser.Types
 open Fetch
 
 open Bix.Types

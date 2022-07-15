@@ -1,12 +1,8 @@
 ﻿namespace Bix.Deno
 
-
-open URLPattern
-
 open Fable.Core
 open Fable.Core.JsInterop
 
-open Browser.Types
 open Fetch
 
 open Fable.Deno
@@ -14,7 +10,6 @@ open Fable.Deno.Http
 
 open Bix
 open Bix.Types
-open Bix.Handlers
 
 type BixDenoServer(server: Server) =
 

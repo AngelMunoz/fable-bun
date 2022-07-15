@@ -1,6 +1,5 @@
 module Handlers
 
-open Bix
 open Bix.Types
 open Bix.Handlers
 open Feliz.ViewEngine
@@ -43,7 +42,7 @@ let Home (req: Request) =
                   [ Html.h1 $"Hello from {req.method} - {req.url}"
                     Html.sl_button
                         [ prop.custom ("variant", "primary")
-                          prop.text "This is a Shoelace Button and rendered in Bun.sh" ] ]
+                          prop.text "This is a Shoelace Button and rendered in deno.land!" ] ]
               Html.footer [] ]
 
     let styles =

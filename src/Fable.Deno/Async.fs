@@ -1,6 +1,5 @@
 module Fable.Deno.Async
 
-open Fable.Deno
 open System.Collections.Generic
 open Fable.Core
 open Fetch
