@@ -1,15 +1,24 @@
-﻿module Fable.Deno
+﻿namespace Fable.Deno
 
 open System.Collections.Generic
 open Fable.Core
-open Fable.Core.JsInterop
 
 open Fetch
 
-open Bix.Browser.Types
 open Browser.Types
 open System
 
+[<AbstractClass; Erase>]
+type Indexable =
+
+    [<Emit("$0[$1]")>]
+    member _.Item(key: string) : obj = jsNative
+
+[<AbstractClass; Erase>]
+type StringMap =
+
+    [<Emit("$0[$1]")>]
+    member _.Item(string: string) : string = jsNative
 
 type NetAddr =
     abstract hostname: string
@@ -87,39 +96,18 @@ type HttpConn =
 type ServerInit =
     inherit ListenOptions
 
-    abstract handler: RequestHandler
-    abstract onError: (RequestErrorHandler) option
+    abstract handler: Request -> U2<Response, JS.Promise<Response>>
+    abstract onError: (exn -> U2<Response, JS.Promise<Response>>) option
 
 type OnListenParams =
     abstract hostname: string
     abstract port: int
 
-type ServeInit =
-    abstract onError: RequestErrorHandler option
-    abstract onListen: (OnListenParams -> unit) option
-    abstract signal: AbortSignal option
-
 type ConnInfo =
     abstract localAddr: DenoAddr
     abstract remoteAddr: DenoAddr
 
-[<ImportMember "http">]
-type Server(options: ServerInit) =
-
-    member _.closed: bool = jsNative
-    member _.addrs: DenoAddr[] = jsNative
-
-    member _.close() : unit = jsNative
-
-    member _.listenAndServe() : JS.Promise<unit> = jsNative
-    member _.listenAndServeTls(certFile: string, keyFile: string) : JS.Promise<unit> = jsNative
-
-    member _.serve(listener: Listener) : JS.Promise<unit> = jsNative
-
-let serve (handler: RequestHandler, options: ServeInit) : JS.Promise<unit> = importMember "http"
-
-
-[<StringEnum>]
+[<StringEnum; RequireQualifiedAccess>]
 type Signal =
     | [<CompiledName("SIGABRT")>] SIGABRT
     | [<CompiledName("SIGALRM")>] SIGALRM
@@ -322,7 +310,7 @@ type ReadFileOptions =
 type RemoveOptions =
     abstract recursive: bool option
 
-[<StringEnum>]
+[<StringEnum; RequireQualifiedAccess>]
 type DnsRecordType =
     | [<CompiledName("A")>] A
     | [<CompiledName("AAAA")>] AAAA
@@ -347,7 +335,7 @@ type ProcessStatus =
     abstract code: int
     abstract signal: Signal option
 
-[<Erase>]
+[<Erase; RequireQualifiedAccess>]
 type StdioRun =
     | [<CompiledName("inherit")>] Inherit
     | [<CompiledName("piped")>] Piped
@@ -378,7 +366,7 @@ type StartTlsOptions =
     abstract caCerts: string[] option
     abstract hostname: string option
 
-[<StringEnum>]
+[<StringEnum; RequireQualifiedAccess>]
 type SymlinkType =
     | File
     | Dir
@@ -437,7 +425,7 @@ type WatchOptions =
     abstract recursive: bool
 
 
-[<StringEnum>]
+[<StringEnum; RequireQualifiedAccess>]
 type FsEventKind =
     | Any
     | Access

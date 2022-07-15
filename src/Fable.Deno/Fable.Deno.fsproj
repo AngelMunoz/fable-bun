@@ -8,6 +8,11 @@
 
   <ItemGroup>
     <Compile Include="Deno.fs" />
+    <Compile Include="Archive.fs" />
+    <Compile Include="Async.fs" />
+    <Compile Include="Bytes.fs" />
+    <Compile Include="Http.fs" />
+    <Compile Include="Uuid.fs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="*.fsproj; *.fs;" PackagePath="fable\" />
@@ -16,11 +21,9 @@
   <ItemGroup>
     <PackageReference Include="Fable.Browser.Blob" Version="$(FableBrowserBlob)" />
     <PackageReference Include="Fable.Browser.Event" Version="$(FableBrowserEvent)" />
+    <PackageReference Include="Fable.Browser.Url" Version="$(FableBrowserUrl)" />
+    <PackageReference Include="Fable.Browser.WebSocket" Version="$(FableBrowserWebSocket)" />
     <PackageReference Include="Fable.Fetch" Version="$(FableFetch)" />
     <PackageReference Include="Fable.Core" Version="$(FableCore)" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Bix.Browser.Types\Bix.Browser.Types.fsproj" />
   </ItemGroup>
 </Project>
