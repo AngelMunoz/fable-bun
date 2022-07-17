@@ -1,5 +1,0 @@
-{
-  "imports": {
-    "fable-deno-http": "https://deno.land/std/http/mod.ts"
-  }
-}

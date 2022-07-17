@@ -24,13 +24,7 @@ Environment.GetCommandLineArgs()
 
 let output = "./nugets"
 
-let projects =
-    [| "Fable.Bun"
-       "Fable.Deno"
-       "Bix"
-       "Bix.Browser.Types"
-       "Bix.Bun"
-       "Bix.Deno" |]
+let projects = [| "Bun.Fable" |]
 
 let fsharpSourceFiles =
     !! "src/**/*.fs"
