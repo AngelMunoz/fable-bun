@@ -1,3 +1,5 @@
+#!/usr/bin/env -S dotnet fsi
+
 #r "nuget: Fake.DotNet.Cli, 5.22.0"
 #r "nuget: Fake.IO.FileSystem, 5.22.0"
 #r "nuget: Fake.Core.Target, 5.22.0"
